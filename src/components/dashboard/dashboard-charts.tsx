@@ -11,7 +11,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -61,18 +60,30 @@ export function LeadsByIndustryChart({ data }: { data: { name: string; count: nu
       <CardHeader>
         <CardTitle>Leads by Industry</CardTitle>
       </CardHeader>
-      <CardContent className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie data={data} dataKey="count" nameKey="name" outerRadius={90} label={(d) => d.name}>
-              {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-          </PieChart>
-        </ResponsiveContainer>
+      <CardContent className="h-[320px]">
+        <div className="flex h-full flex-col">
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={data} dataKey="count" nameKey="name" outerRadius={90} innerRadius={45} paddingAngle={2}>
+                  {data.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number, name: string) => [`${value} leads`, name]} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+            {data.map((item, i) => (
+              <div key={item.name} className="flex items-center gap-2 text-xs">
+                <div className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                <span className="truncate text-slate-600 dark:text-slate-400">{item.name}</span>
+                <span className="ml-auto font-medium text-slate-900 dark:text-white">{item.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

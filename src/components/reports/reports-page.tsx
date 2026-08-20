@@ -222,19 +222,31 @@ export function ReportsPage() {
 
             <Card>
               <CardHeader><CardTitle>Leads by Industry</CardTitle></CardHeader>
-              <CardContent className="h-80">
+              <CardContent className="h-[420px]">
                 {data.leadsByIndustry.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={data.leadsByIndustry} dataKey="count" nameKey="name" outerRadius={100} label>
-                        {data.leadsByIndustry.map((_, i) => (
-                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend wrapperStyle={{ fontSize: 11 }} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <div className="flex h-full flex-col">
+                    <div className="flex-1">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={data.leadsByIndustry} dataKey="count" nameKey="name" outerRadius={110} innerRadius={50} paddingAngle={2}>
+                            {data.leadsByIndustry.map((_, i) => (
+                              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number, name: string) => [`${value} leads`, name]} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
+                      {data.leadsByIndustry.map((item, i) => (
+                        <div key={item.name} className="flex items-center gap-2 text-xs">
+                          <div className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                          <span className="truncate text-slate-600 dark:text-slate-400">{item.name}</span>
+                          <span className="ml-auto font-medium text-slate-900 dark:text-white">{item.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-slate-500">No data</div>
                 )}
@@ -454,7 +466,8 @@ export function ReportsPage() {
                         dataKey="value"
                         nameKey="name"
                         outerRadius={100}
-                        label
+                        innerRadius={45}
+                        paddingAngle={2}
                       >
                         {Object.keys(data.paymentStatusBreakdown).map((_, i) => (
                           <Cell key={i} fill={COLORS[i % COLORS.length]} />
