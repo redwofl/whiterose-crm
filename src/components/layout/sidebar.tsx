@@ -58,8 +58,8 @@ export function Sidebar() {
       )}
     >
       <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-700 text-white">
-          <Icon icon={Shield} className="h-5 w-5" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+          <img src="/logo.png" alt="WhiteRose" className="h-9 w-9 object-contain" />
         </div>
         {!collapsed && (
           <div className="leading-tight">

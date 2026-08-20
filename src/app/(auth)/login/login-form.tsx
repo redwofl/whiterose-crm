@@ -39,8 +39,8 @@ export default function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-700 text-white">
-            <Shield className="h-6 w-6" />
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl">
+            <img src="/logo.png" alt="WhiteRose" className="h-16 w-16 object-contain" />
           </div>
           <div>
             <h1 className="text-xl font-semibold text-white">WhiteRose</h1>
