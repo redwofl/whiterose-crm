@@ -22,7 +22,9 @@ import {
   StickyNote,
   ExternalLink,
   Edit,
+  MessageCircle,
 } from "lucide-react";
+import { WhatsAppSendDialog } from "@/components/ui/whatsapp-send-dialog";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -244,6 +246,8 @@ export function LeadDetail({ leadId }: { leadId: string }) {
   const [newActivityDesc, setNewActivityDesc] = React.useState("");
   const [addNoteLoading, setAddNoteLoading] = React.useState(false);
   const [addActivityLoading, setAddActivityLoading] = React.useState(false);
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = React.useState(false);
+  const [whatsappTemplates, setWhatsappTemplates] = React.useState<{ id: string; name: string; category: string; message: string; isActive: boolean }[]>([]);
 
   const refetchLead = React.useCallback(async () => {
     try {
@@ -335,6 +339,19 @@ export function LeadDetail({ leadId }: { leadId: string }) {
     }
   };
 
+  React.useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setWhatsappTemplates(data.whatsappTemplates ?? []);
+        }
+      } catch { /* empty */ }
+    }
+    loadTemplates();
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -382,6 +399,17 @@ export function LeadDetail({ leadId }: { leadId: string }) {
               ))}
             </SelectContent>
           </Select>
+          {lead.whatsapp && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
+              onClick={() => setWhatsappDialogOpen(true)}
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </Button>
+          )}
           <Link href={`/leads/${lead.id}?edit=true`}>
             <Button variant="outline" size="sm">
               <Edit className="h-4 w-4" />
@@ -390,6 +418,16 @@ export function LeadDetail({ leadId }: { leadId: string }) {
           </Link>
         </div>
       </div>
+
+      <WhatsAppSendDialog
+        open={whatsappDialogOpen}
+        onOpenChange={setWhatsappDialogOpen}
+        recipientName={lead.contactPerson}
+        recipientMobile={lead.whatsapp || lead.mobile}
+        recipientCompany={lead.businessName}
+        salespersonName={lead.assignedTo?.name}
+        templates={whatsappTemplates}
+      />
 
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">

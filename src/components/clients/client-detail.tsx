@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatINR, formatDate } from "@/lib/utils";
+import { WhatsAppSendDialog } from "@/components/ui/whatsapp-send-dialog";
 
 const STATUS_LABELS: Record<string, string> = {
   ACTIVE: "Active",
@@ -158,6 +159,21 @@ export default function ClientDetailClient({ clientId }: { clientId: string }) {
   const [client, setClient] = React.useState<ClientDetail | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState("overview");
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = React.useState(false);
+  const [whatsappTemplates, setWhatsappTemplates] = React.useState<{ id: string; name: string; category: string; message: string; isActive: boolean }[]>([]);
+
+  React.useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setWhatsappTemplates(data.whatsappTemplates ?? []);
+        }
+      } catch { /* empty */ }
+    }
+    loadTemplates();
+  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -287,7 +303,8 @@ export default function ClientDetailClient({ clientId }: { clientId: string }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`https://wa.me/${client.whatsapp}`, "_blank")}
+            className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
+            onClick={() => setWhatsappDialogOpen(true)}
           >
             <MessageCircle className="mr-2 h-4 w-4" />
             WhatsApp
@@ -304,6 +321,16 @@ export default function ClientDetailClient({ clientId }: { clientId: string }) {
           </Button>
         )}
       </div>
+
+      <WhatsAppSendDialog
+        open={whatsappDialogOpen}
+        onOpenChange={setWhatsappDialogOpen}
+        recipientName={client.contactPerson}
+        recipientMobile={client.whatsapp || client.mobile}
+        recipientCompany={client.businessName}
+        salespersonName={client.accountManager?.name}
+        templates={whatsappTemplates}
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>

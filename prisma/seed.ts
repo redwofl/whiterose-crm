@@ -144,6 +144,30 @@ async function main() {
         message:
           "Hello {{name}}, this is a reminder regarding our WhiteRose software demo scheduled for {{date}} at {{time}}.",
       },
+      {
+        name: "Proposal Sent",
+        category: "Proposal",
+        message:
+          "Hello {{name}}, we've shared a proposal for {{company}}. Please review it at your convenience. Let me know if you have any questions.",
+      },
+      {
+        name: "Welcome Client",
+        category: "Onboarding",
+        message:
+          "Hello {{name}}, welcome to the WhiteRose family! 🎉 We're excited to work with {{company}}. Your dedicated account manager {{salesperson}} will reach out shortly to kick things off.",
+      },
+      {
+        name: "Payment Reminder",
+        category: "Payment",
+        message:
+          "Hello {{name}}, this is a friendly reminder regarding the pending payment for {{company}}. Please let us know if you need any assistance.",
+      },
+      {
+        name: "Thank You",
+        category: "Gratitude",
+        message:
+          "Hello {{name}}, thank you for choosing WhiteRose for {{company}}! We truly appreciate your trust in us. {{salesperson}} is here for anything you need.",
+      },
     ],
     skipDuplicates: true,
   });

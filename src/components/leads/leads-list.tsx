@@ -14,7 +14,9 @@ import {
   Eye,
   ArrowUpDown,
   Filter,
+  MessageCircle,
 } from "lucide-react";
+import { WhatsAppSendDialog } from "@/components/ui/whatsapp-send-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,6 +170,9 @@ export function LeadsList() {
   const [page, setPage] = React.useState(1);
   const [filterData, setFilterData] = React.useState<FilterData | null>(null);
   const [showFilters, setShowFilters] = React.useState(false);
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = React.useState(false);
+  const [whatsappTarget, setWhatsappTarget] = React.useState<{ name: string; mobile: string; company: string } | null>(null);
+  const [whatsappTemplates, setWhatsappTemplates] = React.useState<{ id: string; name: string; category: string; message: string; isActive: boolean }[]>([]);
 
   const filterKey = `${search}|${status}|${priority}|${industryId}|${sourceId}|${areaId}|${assignedToId}|${page}|${sort}`;
   const prevFilterKeyRef = React.useRef(filterKey);
@@ -223,6 +228,20 @@ export function LeadsList() {
     loadLeads();
     return () => { cancelled = true; };
   }, [search, status, priority, industryId, sourceId, areaId, assignedToId, page, sort]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function loadTemplates() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setWhatsappTemplates(data.whatsappTemplates ?? []);
+        }
+      } catch { /* empty */ }
+    }
+    loadTemplates();
+  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -518,6 +537,22 @@ export function LeadsList() {
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
+                          {lead.whatsapp && (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setWhatsappTarget({
+                                  name: lead.contactPerson,
+                                  mobile: lead.whatsapp || lead.mobile,
+                                  company: lead.businessName,
+                                });
+                                setWhatsappDialogOpen(true);
+                              }}
+                            >
+                              <MessageCircle className="mr-2 h-4 w-4 text-green-600" />
+                              WhatsApp
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
@@ -568,6 +603,17 @@ export function LeadsList() {
             </div>
           )}
         </>
+      )}
+
+      {whatsappTarget && (
+        <WhatsAppSendDialog
+          open={whatsappDialogOpen}
+          onOpenChange={setWhatsappDialogOpen}
+          recipientName={whatsappTarget.name}
+          recipientMobile={whatsappTarget.mobile}
+          recipientCompany={whatsappTarget.company}
+          templates={whatsappTemplates}
+        />
       )}
     </div>
   );
