@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Shield, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,11 +39,9 @@ export default function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl">
-            <img src="/logo.png" alt="WhiteRose" className="h-16 w-16 object-contain" />
-          </div>
+          <img src="/logo.png" alt="WhiteRose" className="h-24 w-24 object-contain" />
           <div>
-            <h1 className="text-xl font-semibold text-white">WhiteRose</h1>
+            <h1 className="text-2xl font-bold text-white">WhiteRose</h1>
             <p className="text-sm text-slate-400">Business Operating System</p>
           </div>
         </div>

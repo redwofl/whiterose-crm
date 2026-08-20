@@ -22,7 +22,6 @@ import {
   Settings,
   ChevronsLeft,
   ChevronsRight,
-  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
@@ -57,13 +56,11 @@ export function Sidebar() {
         collapsed ? "w-[76px]" : "w-64"
       )}
     >
-      <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
-          <img src="/logo.png" alt="WhiteRose" className="h-9 w-9 object-contain" />
-        </div>
+      <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
+        <img src="/logo.png" alt="WhiteRose" className="h-10 w-10 shrink-0 object-contain" />
         {!collapsed && (
           <div className="leading-tight">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white">WhiteRose</p>
+            <p className="text-base font-bold text-slate-900 dark:text-white">WhiteRose</p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">Business OS</p>
           </div>
         )}
