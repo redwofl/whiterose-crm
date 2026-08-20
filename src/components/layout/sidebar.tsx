@@ -52,11 +52,11 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden md:flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-200 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none",
+        "hidden md:flex h-screen flex-col border-r-2 border-r-slate-300 bg-white shadow-sm transition-all duration-200 dark:border-r-slate-700 dark:bg-slate-950 dark:shadow-none",
         collapsed ? "w-[76px]" : "w-64"
       )}
     >
-      <div className="flex h-[88px] items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
+      <div className="flex h-[88px] items-center gap-3 border-b-2 border-b-slate-300 px-4 dark:border-b-slate-700">
         <img src="/logo.png" alt="WhiteRose" className="h-16 w-16 shrink-0 object-contain" />
         {!collapsed && (
           <div className="leading-tight">
@@ -90,7 +90,7 @@ export function Sidebar() {
 
       <button
         onClick={() => setCollapsed((v) => !v)}
-        className="flex items-center gap-2 border-t border-slate-200 px-4 py-3 text-xs text-slate-500 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
+        className="flex items-center gap-2 border-t-2 border-t-slate-300 px-4 py-3 text-xs text-slate-500 hover:bg-slate-50 dark:border-t-slate-700 dark:text-slate-400 dark:hover:bg-slate-900"
       >
         {collapsed ? <Icon icon={ChevronsRight} className="h-4 w-4" /> : <Icon icon={ChevronsLeft} className="h-4 w-4" />}
         {!collapsed && "Collapse"}

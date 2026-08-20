@@ -15,7 +15,7 @@ export function Topbar({
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-30 flex h-[88px] items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
+    <header className="sticky top-0 z-30 flex h-[88px] items-center gap-3 border-b-2 border-b-slate-300 bg-white/80 px-4 backdrop-blur dark:border-b-slate-700 dark:bg-slate-950/80">
       <button
         className="md:hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
         onClick={onOpenMobileNav}
