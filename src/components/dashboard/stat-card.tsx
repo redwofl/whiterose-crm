@@ -22,13 +22,13 @@ export function StatCard({
 
   return (
     <Card>
-      <CardContent className="flex items-center gap-4 p-4">
-        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", accentClasses[accent])}>
-          <Icon className="h-5 w-5" />
+      <CardContent className="flex items-center gap-2.5 p-3 sm:gap-4 sm:p-4">
+        <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10", accentClasses[accent])}>
+          <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white">{value}</p>
+          <p className="truncate text-[10px] font-medium text-slate-500 dark:text-slate-400 sm:text-xs">{label}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white sm:text-lg">{value}</p>
         </div>
       </CardContent>
     </Card>

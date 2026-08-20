@@ -164,42 +164,24 @@ export function ReportsPage() {
       {activeTab === "Overview" && (
         <div className="space-y-6">
           {/* Summary Cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             <Card>
-              <CardHeader><CardTitle>Total Leads</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{data.totalLeads}</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Total Leads</p><p className="text-xl font-bold text-slate-900 dark:text-white">{data.totalLeads}</p></div></CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Won</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-emerald-600">{data.wonLeads}</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Won</p><p className="text-xl font-bold text-emerald-600">{data.wonLeads}</p></div></CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Lost</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-red-600">{data.lostLeads}</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Lost</p><p className="text-xl font-bold text-red-600">{data.lostLeads}</p></div></CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Conversion Rate</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-rose-600">{conversionRate}%</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Conversion</p><p className="text-xl font-bold text-rose-600">{conversionRate}%</p></div></CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatINR(data.paymentSummary.paid)}</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Revenue</p><p className="text-xl font-bold text-slate-900 dark:text-white">{formatINR(data.paymentSummary.paid)}</p></div></CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Outstanding</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-amber-600">{formatINR(data.paymentSummary.outstanding)}</p>
-              </CardContent>
+              <CardContent className="p-4"><div><p className="text-xs text-slate-500">Outstanding</p><p className="text-xl font-bold text-amber-600">{formatINR(data.paymentSummary.outstanding)}</p></div></CardContent>
             </Card>
           </div>
 

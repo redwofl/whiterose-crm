@@ -39,11 +39,11 @@ export function LeadsByStatusChart({ data }: { data: { status: string; count: nu
       <CardHeader>
         <CardTitle>Leads by Status</CardTitle>
       </CardHeader>
-      <CardContent className="h-72">
+      <CardContent className="h-64 sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-30} textAnchor="end" height={60} />
+            <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" height={60} />
             <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
             <Tooltip />
             <Bar dataKey="count" fill="#be123c" radius={[4, 4, 0, 0]} />
@@ -60,12 +60,12 @@ export function LeadsByIndustryChart({ data }: { data: { name: string; count: nu
       <CardHeader>
         <CardTitle>Leads by Industry</CardTitle>
       </CardHeader>
-      <CardContent className="h-[320px]">
+      <CardContent className="h-[280px] sm:h-[320px]">
         <div className="flex h-full flex-col">
           <div className="flex-1">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={data} dataKey="count" nameKey="name" outerRadius={90} innerRadius={45} paddingAngle={2}>
+                <Pie data={data} dataKey="count" nameKey="name" outerRadius={80} innerRadius={40} paddingAngle={2}>
                   {data.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
@@ -74,7 +74,7 @@ export function LeadsByIndustryChart({ data }: { data: { name: string; count: nu
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
             {data.map((item, i) => (
               <div key={item.name} className="flex items-center gap-2 text-xs">
                 <div className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
