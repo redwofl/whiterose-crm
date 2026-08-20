@@ -47,13 +47,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.role = (user as unknown as { role: RoleName }).role;
         token.permissions = (user as unknown as { permissions: string[] }).permissions;
-        token.id = user.id;
+        token.id = user.id ?? "";
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = String(token.id ?? "");
         session.user.role = token.role as RoleName;
         session.user.permissions = token.permissions as string[];
       }
