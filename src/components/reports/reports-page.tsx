@@ -1,0 +1,535 @@
+"use client";
+
+import * as React from "react";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  LineChart,
+  Line,
+} from "recharts";
+import { formatINR, formatDate } from "@/lib/utils";
+
+const COLORS = ["#be123c", "#e11d48", "#f43f5e", "#fb7185", "#fda4af", "#fecdd3", "#0f172a", "#334155", "#64748b", "#94a3b8"];
+
+const STATUS_LABELS: Record<string, string> = {
+  NEW_LEAD: "New Lead",
+  CONTACTED: "Contacted",
+  FOLLOW_UP: "Follow Up",
+  INTERESTED: "Interested",
+  DEMO_SCHEDULED: "Demo Scheduled",
+  DEMO_COMPLETED: "Demo Completed",
+  PROPOSAL_REQUESTED: "Proposal Requested",
+  PROPOSAL_SENT: "Proposal Sent",
+  NEGOTIATION: "Negotiation",
+  WON: "Won",
+  LOST: "Lost",
+  ON_HOLD: "On Hold",
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  PARTIALLY_PAID: "Partially Paid",
+  PAID: "Paid",
+  OVERDUE: "Overdue",
+  CANCELLED: "Cancelled",
+};
+
+const TABS = ["Overview", "Leads", "Revenue", "Team", "Payments"] as const;
+
+interface ReportData {
+  leadsByStatus: { status: string; count: number }[];
+  leadsByIndustry: { name: string; count: number }[];
+  leadsBySource: { name: string; count: number }[];
+  leadsByArea: { name: string; count: number }[];
+  conversionFunnel: { status: string; count: number }[];
+  revenueTrend: { month: string; amount: number }[];
+  topPerformers: { name: string; totalLeads: number; won: number; lost: number; totalDealValue: number }[];
+  paymentSummary: { total: number; paid: number; outstanding: number; overdue: number };
+  totalLeads: number;
+  wonLeads: number;
+  lostLeads: number;
+  paymentStatusBreakdown: Record<string, number>;
+  outstandingPayments: {
+    id: string;
+    client: string;
+    totalAmount: number;
+    paidAmount: number;
+    outstanding: number;
+    status: string;
+    dueDate: string | null;
+  }[];
+  revenueByClient: { client: string; total: number; paid: number }[];
+}
+
+export function ReportsPage() {
+  const [data, setData] = React.useState<ReportData | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState<string>("Overview");
+  const [fromDate, setFromDate] = React.useState("");
+  const [toDate, setToDate] = React.useState("");
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/reports");
+        if (!res.ok) throw new Error("Failed to fetch reports");
+        const json = await res.json();
+        if (!cancelled) setData(json);
+      } catch {
+        if (!cancelled) toast.error("Failed to load reports");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-rose-700" />
+      </div>
+    );
+  }
+
+  const conversionRate = data.totalLeads > 0 ? ((data.wonLeads / data.totalLeads) * 100).toFixed(1) : "0";
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Reports</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Analytics and insights</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="w-[150px]"
+            />
+            <span className="text-sm text-slate-500">to</span>
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="w-[150px]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Bar */}
+      <div className="flex gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-900">
+        {TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              activeTab === tab
+                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white"
+                : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Overview Tab */}
+      {activeTab === "Overview" && (
+        <div className="space-y-6">
+          {/* Summary Cards */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <Card>
+              <CardHeader><CardTitle>Total Leads</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{data.totalLeads}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Won</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-emerald-600">{data.wonLeads}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Lost</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-red-600">{data.lostLeads}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Conversion Rate</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-rose-600">{conversionRate}%</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatINR(data.paymentSummary.paid)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Outstanding</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-amber-600">{formatINR(data.paymentSummary.outstanding)}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Leads by Status</CardTitle></CardHeader>
+              <CardContent className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data.leadsByStatus.map((d) => ({ name: STATUS_LABELS[d.status] ?? d.status, count: d.count }))}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={80} />
+                    <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#be123c" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Leads by Industry</CardTitle></CardHeader>
+              <CardContent className="h-80">
+                {data.leadsByIndustry.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={data.leadsByIndustry} dataKey="count" nameKey="name" outerRadius={100} label>
+                        {data.leadsByIndustry.map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-slate-500">No data</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle>Revenue Trend (Last 6 Months)</CardTitle></CardHeader>
+            <CardContent className="h-80">
+              {data.revenueTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data.revenueTrend}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip formatter={(value) => formatINR(Number(value))} />
+                    <Line type="monotone" dataKey="amount" stroke="#be123c" strokeWidth={2} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-slate-500">No revenue data</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Leads Tab */}
+      {activeTab === "Leads" && (
+        <div className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Leads by Source</CardTitle></CardHeader>
+              <CardContent className="h-80">
+                {data.leadsBySource.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.leadsBySource}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#e11d48" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-slate-500">No data</div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Leads by Area</CardTitle></CardHeader>
+              <CardContent className="h-80">
+                {data.leadsByArea.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.leadsByArea}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-slate-500">No data</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle>Conversion Funnel</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {data.conversionFunnel.map((stage) => {
+                  const maxCount = Math.max(...data.conversionFunnel.map((s) => s.count), 1);
+                  const width = maxCount > 0 ? (stage.count / maxCount) * 100 : 0;
+                  return (
+                    <div key={stage.status} className="flex items-center gap-3">
+                      <div className="w-40 text-right text-sm text-slate-600 dark:text-slate-300">
+                        {STATUS_LABELS[stage.status] ?? stage.status}
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-6 rounded-md bg-slate-100 dark:bg-slate-800">
+                          <div
+                            className="h-6 rounded-md bg-rose-600 transition-all"
+                            style={{ width: `${Math.max(width, 2)}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="w-12 text-right text-sm font-medium text-slate-900 dark:text-white">
+                        {stage.count}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Revenue Tab */}
+      {activeTab === "Revenue" && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Monthly Revenue</CardTitle></CardHeader>
+            <CardContent className="h-80">
+              {data.revenueTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data.revenueTrend}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip formatter={(value) => formatINR(Number(value))} />
+                    <Bar dataKey="amount" fill="#be123c" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-slate-500">No revenue data</div>
+              )}
+            </CardContent>
+          </Card>
+
+          {data.revenueByClient.length > 0 && (
+            <Card>
+              <CardHeader><CardTitle>Revenue by Client</CardTitle></CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Client</TableHead>
+                      <TableHead className="text-right">Total Billed</TableHead>
+                      <TableHead className="text-right">Total Paid</TableHead>
+                      <TableHead className="text-right">Outstanding</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.revenueByClient.map((row) => (
+                      <TableRow key={row.client}>
+                        <TableCell className="font-medium">{row.client}</TableCell>
+                        <TableCell className="text-right">{formatINR(row.total)}</TableCell>
+                        <TableCell className="text-right">{formatINR(row.paid)}</TableCell>
+                        <TableCell className="text-right">{formatINR(row.total - row.paid)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Team Tab */}
+      {activeTab === "Team" && (
+        <Card>
+          <CardHeader><CardTitle>Sales Performance</CardTitle></CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-center">Total Leads</TableHead>
+                  <TableHead className="text-center">Won</TableHead>
+                  <TableHead className="text-center">Lost</TableHead>
+                  <TableHead className="text-center">Conversion Rate</TableHead>
+                  <TableHead className="text-right">Total Deal Value</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.topPerformers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-slate-500">No team members</TableCell>
+                  </TableRow>
+                ) : (
+                  data.topPerformers.map((exec) => {
+                    const convRate = exec.totalLeads > 0 ? ((exec.won / exec.totalLeads) * 100).toFixed(1) : "0";
+                    return (
+                      <TableRow key={exec.name}>
+                        <TableCell className="font-medium">{exec.name}</TableCell>
+                        <TableCell className="text-center">{exec.totalLeads}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="success">{exec.won}</Badge>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="danger">{exec.lost}</Badge>
+                        </TableCell>
+                        <TableCell className="text-center">{convRate}%</TableCell>
+                        <TableCell className="text-right font-medium">{formatINR(exec.totalDealValue)}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Payments Tab */}
+      {activeTab === "Payments" && (
+        <div className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Payment Status Breakdown</CardTitle></CardHeader>
+              <CardContent className="h-80">
+                {Object.keys(data.paymentStatusBreakdown).length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={Object.entries(data.paymentStatusBreakdown).map(([status, count]) => ({
+                          name: PAYMENT_STATUS_LABELS[status] ?? status,
+                          value: count,
+                        }))}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={100}
+                        label
+                      >
+                        {Object.keys(data.paymentStatusBreakdown).map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-slate-500">No payment data</div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Payment Summary</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-sm text-slate-500">Total Billed</span>
+                  <span className="font-medium">{formatINR(data.paymentSummary.total)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-slate-500">Total Paid</span>
+                  <span className="font-medium text-emerald-600">{formatINR(data.paymentSummary.paid)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-slate-500">Outstanding</span>
+                  <span className="font-medium text-amber-600">{formatINR(data.paymentSummary.outstanding)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-slate-500">Overdue</span>
+                  <span className="font-medium text-red-600">{formatINR(data.paymentSummary.overdue)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {data.outstandingPayments.length > 0 && (
+            <Card>
+              <CardHeader><CardTitle>Outstanding Payments</CardTitle></CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Client</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead className="text-right">Paid</TableHead>
+                      <TableHead className="text-right">Outstanding</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Due Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.outstandingPayments.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{p.client}</TableCell>
+                        <TableCell className="text-right">{formatINR(p.totalAmount)}</TableCell>
+                        <TableCell className="text-right">{formatINR(p.paidAmount)}</TableCell>
+                        <TableCell className="text-right font-medium">{formatINR(p.outstanding)}</TableCell>
+                        <TableCell>
+                          <Badge variant={p.status === "OVERDUE" ? "danger" : "default"}>
+                            {PAYMENT_STATUS_LABELS[p.status] ?? p.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm">{formatDate(p.dueDate)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
