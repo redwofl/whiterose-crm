@@ -102,6 +102,7 @@ interface Lead {
   businessName: string;
   contactPerson: string;
   mobile: string;
+  whatsapp: string | null;
   email: string | null;
   status: string;
   priority: string;

@@ -28,6 +28,7 @@ interface WhatsAppTemplate {
   name: string;
   category: string;
   message: string;
+  isActive?: boolean;
 }
 
 interface WhatsAppSendDialogProps {
