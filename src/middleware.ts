@@ -2,13 +2,19 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+
+  // Allow static assets through without auth check
+  if (pathname.endsWith(".png") || pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".gif") || pathname.endsWith(".svg") || pathname.endsWith(".ico") || pathname.endsWith(".webp") || pathname.startsWith("/_next")) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET,
     cookieName: "__Secure-authjs.session-token",
   });
   const isLoggedIn = !!token;
-  const pathname = req.nextUrl.pathname;
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/forgot-password");
 
   if (!isLoggedIn && !isAuthPage) {
@@ -25,5 +31,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/auth|api/debug|_next/static|_next/image|favicon.ico|logo.png|.*\\.png$).*)"],
+  matcher: ["/((?!api/auth|api/debug|_next/static|_next/image|favicon.ico).*)"],
 };
