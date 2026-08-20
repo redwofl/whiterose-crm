@@ -48,7 +48,7 @@ async function main() {
     where: { email: "admin@whiterose.in" },
     update: {},
     create: {
-      name: "Rohan Deshmukh",
+      name: "WhiteRose Admin",
       email: "admin@whiterose.in",
       phone: "9820012345",
       passwordHash,
