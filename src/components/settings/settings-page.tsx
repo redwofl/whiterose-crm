@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,8 +33,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatINR } from "@/lib/utils";
+import { signOut } from "next-auth/react";
 
-const TABS = ["Company", "Industries", "Sources", "Areas", "Services", "WhatsApp Templates"] as const;
+const TABS = ["Company", "Industries", "Sources", "Areas", "Services", "WhatsApp Templates", "Account"] as const;
 
 const SERVICE_CATEGORIES = [
   { value: "SOFTWARE_DEVELOPMENT", label: "Software Development" },
@@ -91,6 +92,7 @@ export function SettingsPage() {
   const [templateCategory, setTemplateCategory] = React.useState("");
   const [templateMessage, setTemplateMessage] = React.useState("");
   const [saving, setSaving] = React.useState(false);
+  const [loggingOut, setLoggingOut] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -783,6 +785,33 @@ export function SettingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Account Tab */}
+      {activeTab === "Account" && (
+        <Card>
+          <CardHeader><CardTitle>Account</CardTitle></CardHeader>
+          <CardContent className="space-y-6">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="text-sm font-medium text-slate-900 dark:text-white">Sign Out</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Sign out of your account. You will need to log in again to access the dashboard.
+              </p>
+              <Button
+                variant="destructive"
+                className="mt-3"
+                disabled={loggingOut}
+                onClick={() => {
+                  setLoggingOut(true);
+                  signOut({ callbackUrl: "/login" });
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {loggingOut ? "Signing out..." : "Sign Out"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Template Dialog */}
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
