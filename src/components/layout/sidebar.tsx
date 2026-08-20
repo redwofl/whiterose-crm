@@ -57,11 +57,11 @@ export function Sidebar() {
       )}
     >
       <div className="flex h-18 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
-        <img src="/logo.png" alt="WhiteRose" className="h-12 w-12 shrink-0 object-contain" />
+        <img src="/logo.png" alt="WhiteRose" className="h-16 w-16 shrink-0 object-contain" />
         {!collapsed && (
           <div className="leading-tight">
-            <p className="text-lg font-bold text-slate-900 dark:text-white">WhiteRose</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Business OS</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white">WhiteRose</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Business OS</p>
           </div>
         )}
       </div>
