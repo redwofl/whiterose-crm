@@ -129,7 +129,7 @@ export function NotificationsPage() {
   const unreadCount = data?.notifications.filter((n) => !n.isRead).length ?? 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 md:p-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Notifications</h1>

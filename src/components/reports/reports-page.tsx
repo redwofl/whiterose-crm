@@ -118,7 +118,7 @@ export function ReportsPage() {
   const conversionRate = data.totalLeads > 0 ? ((data.wonLeads / data.totalLeads) * 100).toFixed(1) : "0";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Reports</h1>

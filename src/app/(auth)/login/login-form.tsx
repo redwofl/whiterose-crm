@@ -31,7 +31,7 @@ export default function LoginForm() {
       toast.error("Invalid email or password.");
       return;
     }
-    toast.success("Welcome back!");
+    toast.success("Welcome back WhiteRose");
     router.push(searchParams.get("callbackUrl") || "/dashboard");
   }
 

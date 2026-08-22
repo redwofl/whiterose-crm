@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Search, Bell, Sun, Moon, Menu } from "lucide-react";
 import { useTheme } from "@/components/layout/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,12 @@ export function Topbar({
   onOpenMobileNav?: () => void;
 }) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-[88px] items-center gap-3 border-b-2 border-b-slate-300 bg-white/80 px-4 backdrop-blur dark:border-b-slate-700 dark:bg-slate-950/80">
+    <header className="sticky top-0 z-30 flex h-[88px] items-center gap-3 border-b-2 border-b-slate-400 bg-white/80 px-4 backdrop-blur dark:border-b-slate-500 dark:bg-slate-950/80">
       <button
         className="md:hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
         onClick={onOpenMobileNav}
@@ -24,7 +28,7 @@ export function Topbar({
         <Icon icon={Menu} className="h-5 w-5" />
       </button>
 
-      <div className="relative hidden flex-1 max-w-md md:block">
+      <div className="relative hidden max-w-xl flex-1 md:block">
         <Icon icon={Search} className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
           placeholder="Search leads, clients, phone numbers... (Ctrl+K)"
@@ -39,7 +43,13 @@ export function Topbar({
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           aria-label="Toggle theme"
         >
-          {theme === "dark" ? <Icon icon={Sun} className="h-4 w-4" /> : <Icon icon={Moon} className="h-4 w-4" />}
+          {!mounted ? (
+            <div className="h-4 w-4" />
+          ) : theme === "dark" ? (
+            <Icon icon={Sun} className="h-4 w-4" />
+          ) : (
+            <Icon icon={Moon} className="h-4 w-4" />
+          )}
         </Button>
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Icon icon={Bell} className="h-4 w-4" />

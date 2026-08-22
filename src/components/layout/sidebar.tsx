@@ -48,23 +48,68 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState(false);
+  const [width, setWidth] = React.useState(256);
+  const [dragging, setDragging] = React.useState(false);
+
+  React.useEffect(() => {
+    const stored = window.localStorage.getItem("whiterose-sidebar-width");
+    if (stored) setWidth(parseInt(stored, 10) || 256);
+  }, []);
+
+  React.useEffect(() => {
+    window.localStorage.setItem("whiterose-sidebar-width", String(width));
+  }, [width]);
+
+  function startDrag(e: React.PointerEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragging(true);
+    const startX = e.clientX;
+    const startWidth = width;
+    const onMove = (ev: PointerEvent) => {
+      const next = Math.min(500, Math.max(200, startWidth + ev.clientX - startX));
+      setWidth(next);
+    };
+    const onUp = () => {
+      setDragging(false);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+  }
 
   return (
     <aside
+      style={collapsed ? undefined : { width }}
       className={cn(
-        "hidden md:flex h-screen flex-col border-r-2 border-r-slate-300 bg-white shadow-sm transition-all duration-200 dark:border-r-slate-700 dark:bg-slate-950 dark:shadow-none",
-        collapsed ? "w-[76px]" : "w-64"
+        "relative hidden md:flex h-screen flex-col bg-white shadow-sm dark:bg-slate-950 dark:shadow-none",
+        collapsed ? "w-[76px]" : dragging ? "transition-none" : "transition-all duration-200"
       )}
     >
-      <div className="flex h-[88px] items-center gap-3 border-b-2 border-b-slate-300 px-4 dark:border-b-slate-700">
+      <div className="flex h-[88px] items-center gap-3 border-b-2 border-b-slate-400 px-4 dark:border-b-slate-500">
         <img src="/logo.png" alt="WhiteRose" className="h-16 w-16 shrink-0 object-contain" />
         {!collapsed && (
-          <div className="leading-tight">
-            <p className="text-xl font-bold text-slate-900 dark:text-white">WhiteRose</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Business OS</p>
+          <div className="flex flex-col justify-center leading-none">
+            <p className="text-lg font-bold leading-none text-slate-900 dark:text-white">WhiteRose</p>
+            <p className="mt-1 text-xs leading-none text-slate-500 dark:text-slate-400">Business OS</p>
           </div>
         )}
       </div>
+
+      {!collapsed && (
+        <div
+          onPointerDown={startDrag}
+          className={cn(
+            "absolute right-0 top-[88px] bottom-0 z-10 w-1.5 cursor-col-resize",
+            dragging ? "bg-rose-500/70" : "bg-transparent hover:bg-rose-500/40 active:bg-rose-500/60"
+          )}
+          title="Drag to resize sidebar"
+        />
+      )}
+
+      <div className="pointer-events-none absolute right-0 top-[88px] bottom-0 w-0.5 bg-slate-400 dark:bg-slate-500" />
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
         {NAV_ITEMS.map((item) => {

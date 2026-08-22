@@ -12,7 +12,6 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET,
-    cookieName: "__Secure-authjs.session-token",
   });
   const isLoggedIn = !!token;
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/forgot-password");
