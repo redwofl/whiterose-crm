@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import type { RoleName } from "@/lib/rbac";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
