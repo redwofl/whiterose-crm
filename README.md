@@ -117,12 +117,17 @@ npm run build        # production build
 
 ## 6. Deployment
 
-- **App (frontend + API routes):** Vercel — connect the repo, set the environment
-  variables above in the Vercel dashboard, and deploy.
+- **App (frontend + API routes):** Netlify — connect the repo, set the environment
+  variables listed above in the Netlify dashboard (Site settings → Build & deploy →
+  Environment), and deploy.
 - **Database:** Supabase PostgreSQL (or any managed Postgres). Use the pooled
   connection string for `DATABASE_URL` and the direct connection for `DIRECT_URL` so
-  Prisma migrations work correctly through Vercel's serverless functions.
-- The architecture also supports Docker / a VPS / AWS if you later move off Vercel.
+  Prisma migrations work correctly through Netlify's serverless functions.
+- The architecture also supports Docker / a VPS / AWS if you later move off Netlify.
+
+A `netlify.toml` is included in the repo root — it configures the Next.js build via
+the `@netlify/plugin-nextjs` plugin and bundles Prisma schema files so that the
+data client is available in serverless functions.
 
 Before deploying:
 ```bash

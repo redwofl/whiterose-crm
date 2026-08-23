@@ -70,7 +70,7 @@ export function LeadsByIndustryChart({ data }: { data: { name: string; count: nu
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number, name: string) => [`${value} leads`, name]} />
+                <Tooltip formatter={(value, name) => [`${value} leads`, name]} />
               </PieChart>
             </ResponsiveContainer>
           </div>
